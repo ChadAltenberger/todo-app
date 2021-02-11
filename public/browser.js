@@ -10,7 +10,15 @@ function itemTemplate(item) {
 	`;
 }
 
-// Creat feature
+// Initial Page Load Render
+let itemHTML = items
+	.map(item => {
+		return itemTemplate(item);
+	})
+	.join('');
+document.getElementById('item-list').insertAdjacentHTML('beforeend', itemHTML);
+
+// Create Feature
 let createField = document.getElementById('create-field');
 
 document.getElementById('create-form').addEventListener('submit', e => {
@@ -20,7 +28,7 @@ document.getElementById('create-form').addEventListener('submit', e => {
 			text: createField.value
 		})
 		.then(response => {
-			//creat the HTML for a new item
+			//Create the HTML for a new item
 			document
 				.getElementById('item-list')
 				.insertAdjacentHTML('beforeend', itemTemplate(response.data));
@@ -33,7 +41,7 @@ document.getElementById('create-form').addEventListener('submit', e => {
 });
 
 document.addEventListener('click', e => {
-	// Delete feature
+	// Delete Feature
 	if (e.target.classList.contains('delete-me')) {
 		if (confirm('Do you want to delete item permanently?')) {
 			axios
@@ -49,7 +57,7 @@ document.addEventListener('click', e => {
 		}
 	}
 
-	// Update feature
+	// Update Feature
 	if (e.target.classList.contains('edit-me')) {
 		let userInput = prompt(
 			'Edit here',
