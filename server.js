@@ -37,7 +37,6 @@ app.get('/', (req, res) => {
       <div class="container">
         <h1 class="display-4 text-center py-1">Another To-Do App 🙄</h1>
 				<h3 class="text-center py-1" style="color:grey">(Boring but beneficial!)</h3>
-				
         <div class="jumbotron p-3 shadow-sm">
           <form id="create-form" action='/create-item' method='POST'>
             <div class="d-flex align-items-center">
