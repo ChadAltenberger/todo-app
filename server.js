@@ -1,5 +1,6 @@
 let express = require('express');
 let mongodb = require('mongodb');
+let sanitizeHTML = require('sanitize-html');
 
 let app = express();
 let db;
@@ -20,7 +21,19 @@ mongodb.connect(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.get('/', (req, res) => {
+function passwordProtected(req, res, next) {
+	res.set('WWW-Authenticate', 'Basic realm="Simple To-Do App"');
+	console.log(req.headers.authorization);
+	if (req.headers.authorization == 'Basic YWRtaW46cGFzc3dvcmQ=') {
+		next();
+	} else {
+		res.status(401).send('Authentication required');
+	}
+}
+
+app.use(passwordProtected);
+
+app.get('/', passwordProtected, (req, res) => {
 	db.collection('items')
 		.find()
 		.toArray((err, items) => {
@@ -61,15 +74,23 @@ app.get('/', (req, res) => {
 });
 
 app.post('/create-item', (req, res) => {
-	db.collection('items').insertOne({ text: req.body.text }, (err, info) => {
+	let safeText = sanitizeHTML(req.body.text, {
+		allowedTags: [],
+		allowedAttributes: {}
+	});
+	db.collection('items').insertOne({ text: safeText }, (err, info) => {
 		res.json(info.ops[0]);
 	});
 });
 
 app.post('/update-item', (req, res) => {
+	let safeText = sanitizeHTML(req.body.text, {
+		allowedTags: [],
+		allowedAttributes: {}
+	});
 	db.collection('items').findOneAndUpdate(
 		{ _id: new mongodb.ObjectId(req.body.id) },
-		{ $set: { text: req.body.text } },
+		{ $set: { text: safeText } },
 		() => {
 			res.send('Success!');
 		}
